@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | NexusBank</title>
+    <title>Sign In / Register | NexusBank</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,7 +31,7 @@
 
             <div class="auth-hero">
                 <h1 class="auth-title">Welcome Back</h1>
-                <p class="auth-subtitle">Sign in to access your financial dashboard</p>
+                <p class="auth-subtitle">Sign in to your account or create a new one</p>
                 
                 <div class="auth-features">
                     <div class="feature">
@@ -61,20 +61,27 @@
             </div>
         </div>
 
-        <!-- Right Panel - Login Form -->
+        <!-- Right Panel - Auth Forms -->
         <div class="auth-right">
             <div class="auth-card">
-                <div class="auth-header">
-                    <h2>Sign In</h2>
-                    <p>Enter your credentials to continue</p>
+                <!-- Auth Toggle -->
+                <div class="auth-toggle">
+                    <button class="toggle-btn active" id="showLoginBtn">Sign In</button>
+                    <button class="toggle-btn" id="showRegisterBtn">Register</button>
                 </div>
 
-                <form class="auth-form" id="loginForm">
+                <!-- LOGIN FORM (Default visible) -->
+                <form class="auth-form" id="loginForm" style="display: block;">
+                    <div class="auth-header">
+                        <h2>Sign In</h2>
+                        <p>Enter your credentials to continue</p>
+                    </div>
+
                     <div class="form-group">
-                        <label class="form-label">Email or Username</label>
+                        <label class="form-label">Email</label>
                         <div class="input-with-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" class="form-control" placeholder="john@example.com" required>
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="john@example.com" required>
                         </div>
                     </div>
 
@@ -82,8 +89,8 @@
                         <label class="form-label">Password</label>
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
-                            <input type="password" class="form-control" placeholder="••••••••" required id="password">
-                            <button type="button" class="input-action" id="togglePassword">
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                            <button type="button" class="input-action toggle-password">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -120,27 +127,178 @@
                             <span>Biometric</span>
                         </button>
                     </div>
+                </form>
+
+                <!-- REGISTER FORM (Hidden by default) -->
+                <form class="auth-form" id="registerForm" style="display: none;">
+                    <div class="auth-header">
+                        <h2>Create Account</h2>
+                        <p>Fill in your details to get started</p>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="fullName" class="form-control" placeholder="John Doe" required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="regEmail" class="form-control" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="address" class="form-control" placeholder="123 Main St, City">
+                        </div>
+                    </div>
+
+                    <!-- Occupation & Phone (two columns) -->
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label class="form-label">Occupation</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-briefcase"></i>
+                                <input type="text" id="occupation" class="form-control" placeholder="Software Engineer">
+                            </div>
+                        </div>
+                        <div class="form-group col">
+                            <label class="form-label">Phone</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="phone" class="form-control" placeholder="+1 234 567 8900">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Age & Birth Year (two columns) -->
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label class="form-label">Age *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar"></i>
+                                <input type="number" id="age" class="form-control" placeholder="25" min="18" max="120" required>
+                            </div>
+                        </div>
+                        <div class="form-group col">
+                            <label class="form-label">Birth Year *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="number" id="birthYear" class="form-control" placeholder="2000" min="1900" max="2026" required>
+                            </div>
+                            <small class="form-hint" style="color: var(--text-tertiary); margin-top: 4px; display: block;">
+                                Age will be calculated automatically
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Age/Birth Year mismatch hint -->
+                    <div id="ageMismatchHint" class="form-hint error" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Age and birth year don't match
+                    </div>
+
+                    <!-- ID Type -->
+                    <div class="form-group">
+                        <label class="form-label">ID Type *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-id-card"></i>
+                            <select id="idType" class="form-control" required>
+                                <option value="" disabled selected>Select ID type</option>
+                                <option value="passport">Passport</option>
+                                <option value="driver">Driver License</option>
+                                <option value="national">National ID</option>
+                                <option value="student">Student ID</option>
+                                <option value="other">Other Government ID</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Upload ID Document -->
+                    <div class="form-group">
+                        <label class="form-label">Upload ID Document * (JPG, PNG, PDF)</label>
+                        <div class="file-upload">
+                            <input type="file" id="idDocument" accept=".jpg,.jpeg,.png,.pdf" required>
+                            <div class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click to upload or drag and drop</span>
+                            </div>
+                        </div>
+                        <!-- File preview area -->
+                        <div id="filePreview" class="file-preview" style="display: none;">
+                            <i class="fas fa-file"></i>
+                            <span id="fileName"></span>
+                            <button type="button" id="removeFile" class="btn-remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="fileError" class="form-hint error" style="display: none;"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+                            <button type="button" class="input-action toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <!-- Password strength bar -->
+                        <div class="password-strength">
+                            <div class="strength-bar" id="passwordStrengthBar"></div>
+                        </div>
+                        <!-- Password strength label -->
+                        <div class="strength-label" id="passwordStrengthLabel">Enter a password</div>
+                        
+                        <div class="password-requirements">
+                            <div id="reqLength" class="req-item">✗ At least 8 characters</div>
+                            <div id="reqUppercase" class="req-item">✗ One uppercase letter</div>
+                            <div id="reqLowercase" class="req-item">✗ One lowercase letter</div>
+                            <div id="reqNumber" class="req-item">✗ One number</div>
+                            <div id="reqSpecial" class="req-item">✗ One special character</div>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password *</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••" required>
+                            <button type="button" class="input-action toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="passwordMismatch" class="form-hint error" style="display: none;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Passwords do not match
+                        </div>
+                    </div>
+
+                    <!-- Global error container -->
+                    <div id="registerError" class="form-hint error" style="display: none; margin-bottom: var(--space-lg);"></div>
+
+                    <button type="submit" class="btn btn-primary btn-block" disabled>
+                        <span>Create Account</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
 
                     <div class="auth-footer">
-                        <p>Don't have an account? <a href="#" class="link">Contact support</a></p>
-                        <p class="text-sm">By continuing, you agree to our <a href="#" class="link">Terms</a> and <a href="#" class="link">Privacy Policy</a></p>
+                        <p>By signing up, you agree to our <a href="#" class="link">Terms</a> and <a href="#" class="link">Privacy Policy</a></p>
                     </div>
                 </form>
-            </div>
-
-            <div class="auth-modes">
-                <button class="mode-btn active" data-mode="password">
-                    <i class="fas fa-key"></i>
-                    Password
-                </button>
-                <button class="mode-btn" data-mode="pin">
-                    <i class="fas fa-hashtag"></i>
-                    PIN
-                </button>
-                <button class="mode-btn" data-mode="biometric">
-                    <i class="fas fa-fingerprint"></i>
-                    Biometric
-                </button>
             </div>
         </div>
     </div>
@@ -149,53 +307,10 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <p>Signing you in...</p>
+            <p>Processing...</p>
         </div>
     </div>
 
     <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle password visibility
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            
-            togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-            });
-
-            // Form submission
-            const loginForm = document.getElementById('loginForm');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Show loading
-                loadingOverlay.style.display = 'flex';
-                
-                // Simulate API call
-                setTimeout(() => {
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            });
-
-            // Mode switching
-            const modeButtons = document.querySelectorAll('.mode-btn');
-            modeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    modeButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const mode = this.dataset.mode;
-                    // Handle mode switching logic
-                });
-            });
-        });
-    </script>
 </body>
 </html>

@@ -28,12 +28,12 @@
                 </a>
             </div>
 
-            <!-- User Info -->
+            <!-- User Info - Dynamic from auth -->
             <div class="sidebar-user">
-                <div class="user-avatar">JD</div>
+                <div class="user-avatar" id="userAvatar">JD</div>
                 <div class="user-info">
-                    <div class="user-name">John Doe</div>
-                    <div class="user-email">john@example.com</div>
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-email" id="userEmail">Loading...</div>
                 </div>
                 <button class="theme-toggle" id="sidebarThemeToggle">
                     <i class="fas fa-moon"></i>
@@ -116,12 +116,12 @@
                 </div>
             </nav>
 
-            <!-- Sidebar Footer -->
+            <!-- Sidebar Footer with Logout Button -->
             <div class="sidebar-footer">
-                <a href="index.html" class="btn btn-ghost btn-block">
+                <button id="logoutBtn" class="btn btn-ghost btn-block" style="justify-content: center;">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Sign Out</span>
-                </a>
+                </button>
             </div>
         </aside>
 
@@ -135,7 +135,7 @@
                 
                 <div class="header-title">
                     <h1>Dashboard</h1>
-                    <p>Welcome back, John! Here's your financial overview.</p>
+                    <p id="welcomeMessage">Welcome back! Here's your financial overview.</p>
                 </div>
 
                 <div class="header-actions">
@@ -156,7 +156,7 @@
                 </div>
             </header>
 
-            <!-- Stats Overview -->
+            <!-- Stats Overview - Dynamic -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-card-header">
@@ -165,8 +165,8 @@
                             <i class="fas fa-dollar-sign"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">$42,589.75</div>
-                    <div class="stat-card-change positive">
+                    <div class="stat-card-value" id="totalBalance">$42,589.75</div>
+                    <div class="stat-card-change positive" id="balanceChange">
                         <i class="fas fa-arrow-up"></i>
                         <span>+12.5% this month</span>
                     </div>
@@ -179,7 +179,7 @@
                             <i class="fas fa-arrow-down"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">$8,450.00</div>
+                    <div class="stat-card-value" id="incomeAmount">$8,450.00</div>
                     <div class="stat-card-change positive">
                         <i class="fas fa-arrow-up"></i>
                         <span>+5.2% from last month</span>
@@ -193,7 +193,7 @@
                             <i class="fas fa-arrow-up"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">$3,245.50</div>
+                    <div class="stat-card-value" id="expensesAmount">$3,245.50</div>
                     <div class="stat-card-change negative">
                         <i class="fas fa-arrow-down"></i>
                         <span>-2.1% from last month</span>
@@ -207,7 +207,7 @@
                             <i class="fas fa-percentage"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">28%</div>
+                    <div class="stat-card-value" id="savingsRate">28%</div>
                     <div class="stat-card-change positive">
                         <i class="fas fa-arrow-up"></i>
                         <span>On track for goal</span>
@@ -284,7 +284,8 @@
                             </a>
                         </div>
 
-                        <div class="transaction-list">
+                        <div class="transaction-list" id="transactionList">
+                            <!-- Transactions will be dynamically loaded by app.js -->
                             <div class="transaction-item">
                                 <div class="transaction-icon">
                                     <i class="fas fa-shopping-bag"></i>
@@ -350,14 +351,14 @@
                         <div class="card-header">
                             <div>
                                 <div class="card-title">Your Accounts</div>
-                                <div class="card-subtitle">2 active accounts</div>
+                                <div class="card-subtitle" id="accountCount">2 active accounts</div>
                             </div>
                             <a href="accounts.html" class="btn btn-ghost btn-sm">
                                 <i class="fas fa-plus"></i>
                             </a>
                         </div>
 
-                        <div class="account-list">
+                        <div class="account-list" id="accountList">
                             <div class="account-item">
                                 <div class="account-icon">
                                     <i class="fas fa-university"></i>
@@ -509,103 +510,63 @@
 
     <script src="js/app.js"></script>
     <script>
-        // Dashboard-specific functionality
+        // ============================================
+        // DASHBOARD - DYNAMIC USER DATA & FUNCTIONALITY
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.add('active');
-                sidebarOverlay.classList.add('active');
-            });
-            
-            sidebarOverlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-            });
-            
-            // Theme toggle
-            const themeToggle = document.getElementById('sidebarThemeToggle');
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-theme');
-                const icon = themeToggle.querySelector('i');
-                if (document.body.classList.contains('dark-theme')) {
-                    icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun');
-                } else {
-                    icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon');
+            // ----- LOAD CURRENT USER -----
+            function loadCurrentUser() {
+                // Check both localStorage and sessionStorage
+                const userData = JSON.parse(localStorage.getItem('nexusbank_current_user')) || 
+                                JSON.parse(sessionStorage.getItem('nexusbank_current_user'));
+                
+                if (!userData) {
+                    // No user logged in, redirect to login
+                    window.location.href = 'login.html';
+                    return;
                 }
                 
-                // Save preference
-                localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-            });
-            
-            // Check saved theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-                const icon = themeToggle.querySelector('i');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
+                // Update UI with user data
+                document.getElementById('userName').textContent = userData.name || 'User';
+                document.getElementById('userEmail').textContent = userData.email || '';
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${userData.name.split(' ')[0]}! Here's your financial overview.`;
+                
+                // Generate avatar initials
+                const initials = userData.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2);
+                document.getElementById('userAvatar').textContent = initials;
+                
+                return userData;
             }
-            
-            // Quick transfer modal
-            const quickTransferBtn = document.getElementById('quickTransferBtn');
-            const quickTransferModal = document.getElementById('quickTransferModal');
-            const closeModal = document.getElementById('closeModal');
-            
-            quickTransferBtn.addEventListener('click', () => {
-                quickTransferModal.classList.add('active');
-            });
-            
-            closeModal.addEventListener('click', () => {
-                quickTransferModal.classList.remove('active');
-            });
-            
-            quickTransferModal.addEventListener('click', (e) => {
-                if (e.target === quickTransferModal) {
-                    quickTransferModal.classList.remove('active');
+
+            // ----- LOGOUT FUNCTIONALITY -----
+            function initLogout() {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Clear all session data
+                        localStorage.removeItem('nexusbank_current_user');
+                        sessionStorage.removeItem('nexusbank_current_user');
+                        
+                        // Show logout toast
+                        showToast('Logged out successfully', 'success');
+                        
+                        // Redirect to login after delay
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1000);
+                    });
                 }
-            });
-            
-            // Transfer form submission
-            const transferForm = document.getElementById('transferForm');
-            transferForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const amount = document.getElementById('transferAmount').value;
-                const to = document.getElementById('transferTo').value;
-                
-                if (!to) {
-                    showToast('Please select a recipient', 'error');
-                    return;
-                }
-                
-                if (!amount || parseFloat(amount) <= 0) {
-                    showToast('Please enter a valid amount', 'error');
-                    return;
-                }
-                
-                // Show success message
-                showToast(`Successfully sent $${amount}`, 'success');
-                
-                // Close modal and reset form
-                quickTransferModal.classList.remove('active');
-                transferForm.reset();
-                
-                // In a real app, you would make an API call here
-                console.log('Transfer initiated:', {
-                    to,
-                    amount,
-                    note: document.getElementById('transferNote').value
-                });
-            });
-            
-            // Toast notification function
-            function showToast(message, type = 'info') {
+            }
+
+            // ----- TOAST NOTIFICATION -----
+            window.showToast = function(message, type = 'info') {
                 const toastContainer = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
@@ -616,38 +577,162 @@
                 
                 toastContainer.appendChild(toast);
                 
-                // Remove toast after 5 seconds
                 setTimeout(() => {
                     toast.style.animation = 'slideIn 0.3s ease reverse forwards';
                     setTimeout(() => {
                         toast.remove();
                     }, 300);
-                }, 5000);
-            }
-            
-            // Update live data (simulated)
-            function updateLiveData() {
-                // In a real app, this would fetch from an API
-                const totalBalance = document.querySelector('.stat-card-value');
-                const balance = parseFloat(totalBalance.textContent.replace('$', '').replace(',', ''));
-                const randomChange = (Math.random() * 0.02 - 0.01); // -1% to +1%
-                const newBalance = balance * (1 + randomChange);
+                }, 3000);
+            };
+
+            // ----- MOBILE MENU -----
+            function initMobileMenu() {
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const sidebar = document.getElementById('sidebar');
+                const sidebarOverlay = document.getElementById('sidebarOverlay');
                 
-                totalBalance.textContent = `$${newBalance.toFixed(2)}`;
-                
-                // Update trend indicator
-                const trend = document.querySelector('.stat-card-change');
-                if (randomChange > 0) {
-                    trend.className = 'stat-card-change positive';
-                    trend.innerHTML = `<i class="fas fa-arrow-up"></i><span>+${(randomChange * 100).toFixed(2)}%</span>`;
-                } else {
-                    trend.className = 'stat-card-change negative';
-                    trend.innerHTML = `<i class="fas fa-arrow-down"></i><span>${(randomChange * 100).toFixed(2)}%</span>`;
+                if (mobileMenuBtn && sidebar && sidebarOverlay) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        sidebar.classList.add('active');
+                        sidebarOverlay.classList.add('active');
+                    });
+                    
+                    sidebarOverlay.addEventListener('click', () => {
+                        sidebar.classList.remove('active');
+                        sidebarOverlay.classList.remove('active');
+                    });
                 }
             }
-            
-            // Update data every 30 seconds (simulated live updates)
-            setInterval(updateLiveData, 30000);
+
+            // ----- THEME TOGGLE -----
+            function initThemeToggle() {
+                const themeToggle = document.getElementById('sidebarThemeToggle');
+                
+                // Load saved theme
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    if (themeToggle) {
+                        const icon = themeToggle.querySelector('i');
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    }
+                }
+                
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => {
+                        document.body.classList.toggle('dark-theme');
+                        const icon = themeToggle.querySelector('i');
+                        if (document.body.classList.contains('dark-theme')) {
+                            icon.classList.remove('fa-moon');
+                            icon.classList.add('fa-sun');
+                            localStorage.setItem('theme', 'dark');
+                        } else {
+                            icon.classList.remove('fa-sun');
+                            icon.classList.add('fa-moon');
+                            localStorage.setItem('theme', 'light');
+                        }
+                    });
+                }
+            }
+
+            // ----- QUICK TRANSFER MODAL -----
+            function initQuickTransfer() {
+                const quickTransferBtn = document.getElementById('quickTransferBtn');
+                const quickTransferModal = document.getElementById('quickTransferModal');
+                const closeModal = document.getElementById('closeModal');
+                const transferForm = document.getElementById('transferForm');
+                
+                if (quickTransferBtn && quickTransferModal) {
+                    quickTransferBtn.addEventListener('click', () => {
+                        quickTransferModal.classList.add('active');
+                    });
+                }
+                
+                if (closeModal && quickTransferModal) {
+                    closeModal.addEventListener('click', () => {
+                        quickTransferModal.classList.remove('active');
+                    });
+                }
+                
+                if (quickTransferModal) {
+                    quickTransferModal.addEventListener('click', (e) => {
+                        if (e.target === quickTransferModal) {
+                            quickTransferModal.classList.remove('active');
+                        }
+                    });
+                }
+                
+                if (transferForm) {
+                    transferForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        
+                        const amount = document.getElementById('transferAmount').value;
+                        const to = document.getElementById('transferTo').value;
+                        
+                        if (!to) {
+                            showToast('Please select a recipient', 'error');
+                            return;
+                        }
+                        
+                        if (!amount || parseFloat(amount) <= 0) {
+                            showToast('Please enter a valid amount', 'error');
+                            return;
+                        }
+                        
+                        showToast(`Successfully sent $${amount}`, 'success');
+                        
+                        quickTransferModal.classList.remove('active');
+                        transferForm.reset();
+                        
+                        // Update balance (simulated)
+                        const balanceEl = document.getElementById('totalBalance');
+                        if (balanceEl) {
+                            const currentBalance = parseFloat(balanceEl.textContent.replace('$', '').replace(',', ''));
+                            const newBalance = currentBalance - parseFloat(amount);
+                            balanceEl.textContent = `$${newBalance.toFixed(2)}`;
+                        }
+                    });
+                }
+            }
+
+            // ----- SIMULATED LIVE DATA UPDATES -----
+            function initLiveUpdates() {
+                function updateLiveData() {
+                    const balanceEl = document.getElementById('totalBalance');
+                    if (balanceEl) {
+                        const balance = parseFloat(balanceEl.textContent.replace('$', '').replace(',', ''));
+                        const randomChange = (Math.random() * 0.02 - 0.01);
+                        const newBalance = balance * (1 + randomChange);
+                        balanceEl.textContent = `$${newBalance.toFixed(2)}`;
+                        
+                        const changeEl = document.getElementById('balanceChange');
+                        if (changeEl) {
+                            const percent = (randomChange * 100).toFixed(2);
+                            if (randomChange > 0) {
+                                changeEl.className = 'stat-card-change positive';
+                                changeEl.innerHTML = `<i class="fas fa-arrow-up"></i><span>+${percent}%</span>`;
+                            } else {
+                                changeEl.className = 'stat-card-change negative';
+                                changeEl.innerHTML = `<i class="fas fa-arrow-down"></i><span>${percent}%</span>`;
+                            }
+                        }
+                    }
+                }
+                
+                // Update every 30 seconds
+                setInterval(updateLiveData, 30000);
+            }
+
+            // ----- INITIALIZE ALL -----
+            const user = loadCurrentUser();
+            if (user) {
+                initLogout();
+                initMobileMenu();
+                initThemeToggle();
+                initQuickTransfer();
+                initLiveUpdates();
+            }
         });
     </script>
     
@@ -711,6 +796,53 @@
             font-size: 0.75rem;
             padding: 2px 6px;
             border-radius: var(--radius-full);
+        }
+        
+        #logoutBtn {
+            color: var(--error);
+            transition: all var(--transition-fast);
+        }
+        
+        #logoutBtn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--error);
+        }
+        
+        .toast {
+            position: relative;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+        
+        .toast.success {
+            border-left-color: var(--success);
+        }
+        
+        .toast.error {
+            border-left-color: var(--error);
+        }
+        
+        .toast.info {
+            border-left-color: var(--info);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </body>
